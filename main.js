@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         Mouse Move Text Extractor with Highlight and Selectable Text (Command + Shift)
+// @name         Mouse Move Text Extractor with Highlight, Selectable Text, Clipboard Copy, and Centered Notification (Command + Shift)
 // @namespace    http://tampermonkey.net/
-// @version      0.4
-// @description  Extract text content from elements on mouse hover when Command + Shift key is pressed, with highlight and selectable text
+// @version      0.6
+// @description  Extract text content from elements on mouse hover when Command + Shift key is pressed, with highlight, selectable text, clipboard copy, and centered popup notification
 // @author       You
 // @match        *://*/*
 // @grant        GM_addStyle
@@ -18,7 +18,7 @@
             background-color: rgba(0, 0, 0, 0.7);
             color: white;
             padding: 5px;
-            font-size: 18px;
+            font-size: 16px;
             border-radius: 5px;
             z-index: 9999;
             pointer-events: auto; /* 允许选择文本 */
@@ -27,12 +27,31 @@
         .highlighted-element {
             background-color: rgba(255, 255, 0, 0.5); /* 高亮背景色 */
         }
+        #copy-notification {
+            position: fixed;
+            background-color: rgba(0, 255, 0, 0.8);
+            color: white;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            z-index: 9998;
+            display: none;
+            transform: translate(-50%, -50%);
+            top: 50%;
+            left: 50%;
+        }
     `);
 
     // 创建一个用于展示文本的 div
     const overlay = document.createElement('div');
     overlay.id = 'mouse-text-overlay';
     document.body.appendChild(overlay);
+
+    // 创建一个用于显示提示的 div
+    const notification = document.createElement('div');
+    notification.id = 'copy-notification';
+    notification.textContent = 'Text copied to clipboard!';
+    document.body.appendChild(notification);
 
     let listening = false;
     let currentHighlightedElement = null;
@@ -75,7 +94,7 @@
             const element = document.elementFromPoint(event.clientX, event.clientY);
             if (element) {
                 const textContent = element.textContent || element.innerText || '';  // 获取文本内容
-                overlay.textContent = textContent.trim().substring(0, 500);  // 截取前100个字符显示
+                overlay.textContent = textContent.trim().substring(0, 600);  // 截取前100个字符显示
 
                 // 高亮当前元素
                 if (currentHighlightedElement && currentHighlightedElement !== element) {
@@ -108,6 +127,23 @@
         if (currentHighlightedElement) {
             currentHighlightedElement.classList.remove('highlighted-element');
             currentHighlightedElement = null;
+        }
+    });
+
+    // 当点击展示文本时，将文本复制到剪切板
+    overlay.addEventListener('click', () => {
+        const textToCopy = overlay.textContent;
+        if (textToCopy) {
+            // 使用 Clipboard API 复制文本
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                // 显示复制提示
+                notification.style.display = 'block';
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 2000);  // 2秒后隐藏提示
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
         }
     });
 })();
