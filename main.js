@@ -61,7 +61,7 @@
     let shiftPressed = false;
 
     window.addEventListener('keydown', (event) => {
-        if (event.key === 'Meta') {  // 'Meta' 键对应 Command 键
+        if (event.key === 'Meta' || event.key === 'Alt') {  // 'Meta' 键对应 Command 键
             commandPressed = true;
         }
         if (event.key === 'Shift') {
@@ -75,7 +75,7 @@
     });
 
     window.addEventListener('keyup', (event) => {
-        if (event.key === 'Meta') {
+        if (event.key === 'Meta' || event.key === 'Alt') {
             commandPressed = false;
         }
         if (event.key === 'Shift') {
