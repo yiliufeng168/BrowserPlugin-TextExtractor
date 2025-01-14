@@ -45,6 +45,7 @@
     // 创建一个用于展示文本的 div
     const overlay = document.createElement('div');
     overlay.id = 'mouse-text-overlay';
+    overlay.style.display = 'none';
     document.body.appendChild(overlay);
 
     // 创建一个用于显示提示的 div
